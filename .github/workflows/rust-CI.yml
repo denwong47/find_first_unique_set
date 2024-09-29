@@ -1,0 +1,35 @@
+name: Rust
+
+on:
+  push:
+    branches: [ "main", "development", "staging" ]
+    paths:
+      - 'src/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+  pull_request:
+    branches: [ "main", "development", "staging" ]
+    paths:
+      - 'src/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: hecrj/setup-rust-action@v2
+    - name: Build
+      run: cargo build --verbose
+    - name: Check formatting
+      run: cargo fmt --all -- --check
+    - name: Check clippy
+      run: cargo clippy --all-targets --all-features -- -D warnings
+    - name: Run tests
+      run: RUST_LOG=debug cargo test --verbose -- --nocapture
